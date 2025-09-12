@@ -1,10 +1,9 @@
 #pragma once
+#include "driver/twai.h"
 
-#include <esp32_can.h>
-
-#define CAN_TXD_PIN     (gpio_num_t)5
-#define CAN_RXD_PIN     (gpio_num_t)4
+#define CAN_TX_GPIO     (gpio_num_t)5
+#define CAN_RX_GPIO     (gpio_num_t)4
 
 #define CANBUS_SPEED    500000   // 500kbps
 
-void CANBus_Init();
+void canbus_init();

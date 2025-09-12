@@ -1,14 +1,26 @@
+#include "Arduino.h"
 #include "CANBus_Driver.h"
 #include <stdio.h>
 
-void CANBus_Init(void) {
-    CAN0.setCANPins(CAN_RXD_PIN, CAN_TXD_PIN); // Set RX and TX pins
+void canbus_init(void) {
+
+  // Configure TWAI (CAN)
+    twai_general_config_t g_config = TWAI_GENERAL_CONFIG_DEFAULT(CAN_TX_GPIO, CAN_RX_GPIO, TWAI_MODE_NORMAL);
+    twai_timing_config_t t_config = TWAI_TIMING_CONFIG_500KBITS();
+    twai_filter_config_t f_config = TWAI_FILTER_CONFIG_ACCEPT_ALL();  // Accept all IDs
  
-    if (!CAN0.begin(CANBUS_SPEED)) {
-        printf("CAN bus initialization failed\n");
-        return;
+    // Install and start TWAI driver
+    if (twai_driver_install(&g_config, &t_config, &f_config) == ESP_OK) {
+        Serial.println("TWAI driver installed.");
+    } else {
+        Serial.println("Failed to install TWAI driver.");
+        while (1);
     }
 
-    CAN0.watchFor(); // Start listening (optional if you plan to filter later)
-    printf("CAN bus initialized at %d bps on RX=%d, TX=%d\n", CANBUS_SPEED, CAN_RXD_PIN, CAN_TXD_PIN);
+    if (twai_start() == ESP_OK) {
+        Serial.println("TWAI driver started. Listening for messages...");
+    } else {
+        Serial.println("Failed to start TWAI driver.");
+        while (1);
+    }
 }
